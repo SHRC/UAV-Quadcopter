@@ -1,6 +1,6 @@
 CC=avr-gcc
 MCU=atmega328
-TARGET= blink.c
+TARGET= main.c
 PROGRAMMER=avrisp2
 CFLAGS= -mmcu=$(MCU) -Wall -Os -mcall-prologues
 
