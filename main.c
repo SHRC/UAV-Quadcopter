@@ -30,11 +30,16 @@ void setupMotors(){
 }
 
 int main(void){
+    setupMotors();
     int testpower = 0;
     while(1){
         testpower++;
         if (testpower > 100){
             testpower = 0;
+            OCR0A = testpower;
+            OCR0B = testpower;
+            OCR2A = testpower;
+            OCR2B = testpower;
         }
         _delay_ms(20);
     }

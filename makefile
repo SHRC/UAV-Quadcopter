@@ -5,7 +5,7 @@ PROGRAMMER=avrisp2
 CFLAGS= -mmcu=$(MCU) -Wall -Os -mcall-prologues
 
 DEPS = i2csoft.h io.h delay.h linmath.h
-OBJ = blink.o
+OBJ = main.o
 
 %.o: %.c $(DEPS)
 	$(CC) -o $@ $^ $(CFLAGS)
