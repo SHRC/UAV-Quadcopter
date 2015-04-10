@@ -39,7 +39,7 @@ int main(void){
             OCR0A = testpower;
             OCR0B = testpower;
             OCR2A = testpower;
-            OCR2B = testpower;
+            OCR2A = testpower;
         }
         _delay_ms(20);
     }

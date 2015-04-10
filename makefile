@@ -21,4 +21,4 @@ clean:
 	rm -f *.o *.elf *.hex
 
 upload:
-	avrdude -p $(MCU) -c $(PROGRAMMER) -e -U flash:w:quadcontrol.hex
+	avrdude -p $(MCU) -v -c $(PROGRAMMER) -e -U flash:w:quadcontrol.hex
