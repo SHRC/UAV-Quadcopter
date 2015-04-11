@@ -1,7 +1,7 @@
 CC=avr-gcc
 MCU=atmega328
 TARGET= main.c
-PROGRAMMER=avrisp2
+PROGRAMMER=avrispmkii
 CFLAGS= -mmcu=$(MCU) -Wall -Os -mcall-prologues
 
 DEPS = i2csoft.h io.h delay.h linmath.h
