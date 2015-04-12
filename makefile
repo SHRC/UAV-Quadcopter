@@ -11,19 +11,19 @@ CFLAGS= -mmcu=$(MCU) -Wall -Os -mcall-prologues
 INCLUDES = -I include
 
 all: quadcontrol.o
-	$(CC) -o quadcontrol.elf quadcontrol.o
+	$(CC) -o build/quadcontrol.elf build/quadcontrol.o
 	rm -f quadcontrol.hex
-	avr-objcopy -j .text -j .data -O ihex quadcontrol.elf quadcontrol.hex
-	avr-size --format=avr --mcu=$(MCU) quadcontrol.elf
+	avr-objcopy -j .text -j .data -O ihex build/quadcontrol.elf quadcontrol.hex
+	avr-size --format=avr --mcu=$(MCU) build/quadcontrol.elf
 
 clean:
-	rm -rf *.o *.elf *.hex objects/*.o
+	rm -rf *.o *.elf *.hex build/*.o
 
 upload:
 	avrdude -p $(BOARD) -c $(PROGRAMMER) -e -U flash:w:quadcontrol.hex
 
 quadcontrol.o: main.o
-	$(CC) $(CFLAGS) $(INCLUDES) -c main.c -o quadcontrol.o
+	$(CC) $(CFLAGS) $(INCLUDES) -c main.c -o build/quadcontrol.o
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o build/$@
