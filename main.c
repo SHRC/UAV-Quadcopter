@@ -7,7 +7,7 @@
 #include "include/i2csoft.h"
 
 #define FL_MOTOR_PIN DDD3
-#define FR_MOTOR_PIN DDB1
+#define FR_MOTOR_PIN DDB3
 
 #define BL_MOTOR_PIN DDD5
 #define BR_MOTOR_PIN DDD6
@@ -20,12 +20,12 @@ void setupMotors(){
 
     OCR0A = 0;
     OCR0B = 0;
-    TCCR0A |= (_BV(COM0A1) | _BV(WGM00) | _BV(WGM01));
+    TCCR0A |= (_BV(COM0A1) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01));
     TCCR0B |= _BV(CS01);
 
     OCR2A = 0;
     OCR2B = 0;
-    TCCR2A |= (_BV(COM2A1) | _BV(WGM20) | _BV(WGM21));
+    TCCR2A |= (_BV(COM2A1) | _BV(COM2B1) | _BV(WGM20) | _BV(WGM21));
     TCCR2B |= _BV(CS21);
 }
 
@@ -34,13 +34,13 @@ int main(void){
     int testpower = 0;
     while(1){
         testpower++;
-        if (testpower > 100){
+        if (testpower > 256){
             testpower = 0;
-            OCR0A = testpower;
-            OCR0B = testpower;
-            OCR2A = testpower;
-            OCR2A = testpower;
         }
-        _delay_ms(20);
+        OCR0A = testpower;
+        OCR0B = testpower;
+        OCR2A = testpower;
+        OCR2B = testpower;
+        _delay_ms(50);
     }
 }
