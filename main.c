@@ -12,6 +12,13 @@
 #define BL_MOTOR_PIN DDD5
 #define BR_MOTOR_PIN DDD6
 
+typedef enum {
+    FL_MOTOR = 0, //Pin 3
+    FR_MOTOR, //Pin 5
+    RL_MOTOR, //Pin 6
+    RR_MOTOR //Pin 11
+} MOTOR_NUM;
+
 void setupMotors(){
     DDRD |= _BV(FL_MOTOR_PIN);
     DDRB |= _BV(FR_MOTOR_PIN);
@@ -29,6 +36,15 @@ void setupMotors(){
     TCCR2B |= _BV(CS21);
 }
 
+void setMotorPower(MOTOR_NUM n_motor, int power){
+    switch(n_motor){
+    case FL_MOTOR: OCR2B = power;
+    case FR_MOTOR: OCR0B = power;
+    case RL_MOTOR: OCR0A = power;
+    case RR_MOTOR: OCR2A = power;
+    }
+}
+
 int main(void){
     setupMotors();
     int testpower = 0;
@@ -37,10 +53,10 @@ int main(void){
         if (testpower > 256){
             testpower = 0;
         }
-        OCR0A = testpower;
-        OCR0B = testpower;
-        OCR2A = testpower;
-        OCR2B = testpower;
-        _delay_ms(50);
+        setMotorPower(FR_MOTOR, testpower);
+        setMotorPower(FL_MOTOR, testpower);
+        setMotorPower(RR_MOTOR, testpower);
+        setMotorPower(RL_MOTOR, testpower);
+        _delay_ms(200);
     }
 }

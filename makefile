@@ -17,7 +17,7 @@ all: quadcontrol.o
 	avr-size --format=avr --mcu=$(MCU) build/quadcontrol.elf
 
 clean:
-	rm -rf *.o *.elf *.hex build/*.o
+	rm -rf *.o *.elf *.hex build/*.o build/*.elf
 
 upload:
 	avrdude -p $(BOARD) -c $(PROGRAMMER) -e -U flash:w:quadcontrol.hex
