@@ -46,6 +46,7 @@ void setMotorPower(MOTOR_NUM n_motor, int power){
 }
 
 int main(void){
+    SoftI2CInit();
     setupMotors();
     int testpower = 0;
     while(1){

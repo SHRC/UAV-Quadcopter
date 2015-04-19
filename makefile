@@ -22,8 +22,8 @@ clean:
 upload:
 	avrdude -p $(BOARD) -c $(PROGRAMMER) -e -U flash:w:quadcontrol.hex
 
-quadcontrol.o: main.o
-	$(CC) $(CFLAGS) $(INCLUDES) -c main.c -o build/quadcontrol.o
-
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o build/$@
+
+quadcontrol.o: main.o
+	$(CC) $(CFLAGS) $(INCLUDES) -c main.c -o build/quadcontrol.o
