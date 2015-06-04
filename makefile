@@ -3,27 +3,29 @@
 .PHONY: upload
 CC=avr-gcc
 MCU=atmega328
-TARGET= main.c
+TARGET= main
 PROGRAMMER=usbtiny
 BOARD=m328p
 CFLAGS= -mmcu=$(MCU) -Wall -Os -mcall-prologues
+SOURCES= main.c include/I2C_master.c
+OBJECTS= $(SOURCES:.c=.o)
+HEADERS= $(SOURCES:.c=.h) include/linmath.h
 
-INCLUDES = -I include
+INCLUDES = -I.
 
-all: quadcontrol.o
-	$(CC) -o build/quadcontrol.elf build/quadcontrol.o
-	rm -f quadcontrol.hex
-	avr-objcopy -j .text -j .data -O ihex build/quadcontrol.elf quadcontrol.hex
-	avr-size --format=avr --mcu=$(MCU) build/quadcontrol.elf
+all: main.hex
 
 clean:
-	rm -rf *.o *.elf *.hex build/*.o build/*.elf
+	rm -rf *.o *.elf *.hex build/*.o build/*.elf include/*.o
 
-upload:
-	avrdude -p $(BOARD) -c $(PROGRAMMER) -e -U flash:w:quadcontrol.hex
+upload: main.hex
+	avrdude -p $(BOARD) -c $(PROGRAMMER) -e -U flash:w:main.hex -v
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o build/$@
+	$(CC) $(CFLAGS) -c $< -o build/$(lastword $(subst /, ,$@))
 
-quadcontrol.o: main.o
-	$(CC) $(CFLAGS) $(INCLUDES) -c main.c -o build/quadcontrol.o
+$(TARGET).elf: $(OBJECTS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(addprefix build/, $(notdir $^)) -o build/main.elf
+
+%.hex: %.elf
+	avr-objcopy -j .text -j .data -O ihex build/$< $@

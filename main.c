@@ -4,6 +4,7 @@
 #include <util/delay.h>
 
 #include "include/linmath.h"
+#include "include/I2C_master.h"
 
 #define FL_MOTOR_PIN DDD3
 #define FR_MOTOR_PIN DDB3
@@ -45,6 +46,7 @@ void setMotorPower(MOTOR_NUM n_motor, int power){
 }
 
 int main(void){
+    I2C_init();
     setupMotors();
     int testpower = 0;
     while(1){
@@ -56,6 +58,6 @@ int main(void){
         setMotorPower(FL_MOTOR, testpower);
         setMotorPower(RR_MOTOR, testpower);
         setMotorPower(RL_MOTOR, testpower);
-        _delay_ms(200);
+        _delay_ms(20);
     }
 }
