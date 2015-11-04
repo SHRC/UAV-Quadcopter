@@ -1,11 +1,17 @@
 #include <util/twi.h>
+
 #define F_SCL 100000UL // SCL frequency
 #define Prescaler 1
 #define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
+#define GYRO_CALIB = 1.0; // Need to test for this
 
 int16_t rawAccelData[3];
 int16_t rawMagneData[3];
 int16_t rawGyroData[3];
+
+int16_t quadNorm[3];
+int16_t oriX[2];
+int16_t oriZ[2];
 
 void setup(){
   I2C_init();
@@ -174,4 +180,31 @@ void getGyroVec(uint16_t *data){
   data[2] |= (I2C_read_nack() << 8);
   I2C_stop();
 }
+
+void getQuadNorm() {
+  quadNorm[0] = -rawAccelData[0];
+  quadNorm[1] = rawAccelData[1];
+  quadNorm[2] = -rawAccelData[2];
+}
+
+void getOriX(int dt) {
+ int16_t x = oriX[0];
+ int16_t z = oriX[1];
+ 
+ float dtheta = GYRO_CALIB * rawGyroData[1] * dt;
+ oriX[0] = x * cos(dtheta) - z * sin(dtheta);
+ oriX[1] = x * sin(dtheta) + z * cos(dtheta);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
