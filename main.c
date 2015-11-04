@@ -60,4 +60,6 @@ int main(void){
         setMotorPower(RL_MOTOR, testpower);
         _delay_ms(20);
     }
+
+	return 1;
 }
