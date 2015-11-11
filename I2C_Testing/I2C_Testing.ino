@@ -3,15 +3,20 @@
 #define F_SCL 100000UL // SCL frequency
 #define Prescaler 1
 #define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
-#define GYRO_CALIB = 1.0; // Need to test for this
+#define GYRO_CALIB 1.0 // Need to test for this
+#define TORQUE_CALIB 1.0 // Need to test for this
 
 int16_t rawAccelData[3];
 int16_t rawMagneData[3];
 int16_t rawGyroData[3];
 
-int16_t quadNorm[3];
-int16_t oriX[2];
-int16_t oriZ[2];
+int16_t base[3];
+
+int16_t quadNorm[3]; // Unit vector normal to the plane of the quadcopter in global terms
+int16_t oriX[2]; // Unit vector pointing in the direction of the East side of the quadcopter
+int16_t oriY[2]; // Unit vector pointing in the direction of the North side of the quadcopter
+
+int16_t * torque;
 
 void setup(){
   I2C_init();
@@ -188,17 +193,36 @@ void getQuadNorm() {
 }
 
 void getOriX(int dt) {
- int16_t x = oriX[0];
- int16_t z = oriX[1];
+ int16_t xx = oriX[0];
+ int16_t xy = oriX[1];
+ 
+ int16_t yx = oriY[0];
+ int16_t yy = oriY[1];
  
  float dtheta = GYRO_CALIB * rawGyroData[1] * dt;
- oriX[0] = x * cos(dtheta) - z * sin(dtheta);
- oriX[1] = x * sin(dtheta) + z * cos(dtheta);
+ oriX[0] = xx * cos(dtheta) - xy * sin(dtheta);
+ oriX[1] = xx * sin(dtheta) + xy * cos(dtheta);
+ 
+ oriY[0] = yx * cos(dtheta) - yy * sin(dtheta);
+ oriY[1] = yx * sin(dtheta) + yy * cos(dtheta);
 }
 
 
+void getTorque(const int16_t* move) {
+  int16_t resultant[] {base[0] + move[0], base[1] + move[1], base[2] + move[2]};
+  torque = cross(quadNorm, resultant);
+  torque[0] *= TORQUE_CALIB;
+  torque[1] *= TORQUE_CALIB;
+  torque[2] *= TORQUE_CALIB;
+}
 
-
+int16_t* cross(const int16_t* v1, const int16_t* v2) {
+  int16_t answer[3];
+  answer[0] = v1[1] * v2[2] - v1[2] * v2[1];
+  answer[1] = v1[2] * v2[0] - v1[0] * v2[2];
+  answer[2] = v1[0] * v2[1] - v1[1] * v2[0];
+  return answer;
+}
 
 
 
