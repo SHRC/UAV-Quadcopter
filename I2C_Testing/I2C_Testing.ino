@@ -5,10 +5,15 @@
 #define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
 #define GYRO_CALIB 1.0 // Need to test for this
 #define TORQUE_CALIB 1.0 // Need to test for this
+#define BUFFER_SIZE 7
 
 int16_t rawAccelData[3];
 int16_t rawMagneData[3];
 int16_t rawGyroData[3];
+
+int16_t averageAccelData[3];
+int16_t accelDataBuffer[BUFFER_SIZE][3];
+int buffer_oldest_index = 0;
 
 int16_t base[3];
 
@@ -157,6 +162,11 @@ void gyro_init(void){
   
 
 void getAccelVec(uint16_t *data){
+  accelDataBuffer[buffer_oldest_index][0] = rawAccelData[0];
+  accelDataBuffer[buffer_oldest_index][1] = rawAccelData[1];
+  accelDataBuffer[buffer_oldest_index][2] = rawAccelData[2];
+  buffer_oldest_index = (buffer_oldest_index + 1) % BUFFER_SIZE;
+  
   I2C_start(0b00110010);
   I2C_write(0xA8);
   I2C_start(0b00110011);
@@ -167,6 +177,8 @@ void getAccelVec(uint16_t *data){
   data[2] = I2C_read_ack();
   data[2] |= (I2C_read_nack() << 8);
   I2C_stop();
+  
+
 }
 
 void getMagneVec(uint16_t *data){
@@ -233,7 +245,34 @@ int16_t* cross(const int16_t* v1, const int16_t* v2) {
   return answer;
 }
 
-
+void getAverageAccelData() {
+   int16_t sum = 0;
+   // Component 1
+   for (int i = 0; i < BUFFER_SIZE; i++) {
+      sum += accelDataBuffer[i][0]; 
+   }
+   sum /= BUFFER_SIZE;
+   
+   averageAccelData[0] = sum;
+   
+   // Component 2
+   sum = 0;
+   for (int i = 0; i < BUFFER_SIZE; i++) {
+      sum += accelDataBuffer[i][1]; 
+   }
+   sum /= BUFFER_SIZE;
+   
+   averageAccelData[1] = sum;
+   
+   // Component 3
+   sum = 0;
+   for (int i = 0; i < BUFFER_SIZE; i++) {
+      sum += accelDataBuffer[i][2]; 
+   }
+   sum /= BUFFER_SIZE;
+   
+   averageAccelData[2] = sum;
+}
 
 
 
