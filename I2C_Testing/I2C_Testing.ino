@@ -28,26 +28,35 @@ void setup(){
 }
 
 void loop(void){
-  getAccelVec((uint16_t *)rawAccelData);
-  Serial.print(rawAccelData[0]);
+//  getAccelVec((uint16_t *)rawAccelData);
+//  Serial.print(rawAccelData[0]);
+//  Serial.print(", ");
+//  Serial.print(rawAccelData[1]);
+//  Serial.print(", ");
+//  Serial.println(rawAccelData[2]);
+//  
+//  getMagneVec((uint16_t *)rawMagneData);
+//  Serial.print(rawMagneData[0]);
+//  Serial.print(", ");
+//  Serial.print(rawMagneData[1]);
+//  Serial.print(", ");
+//  Serial.println(rawMagneData[2]);
+//  
+//  getGyroVec((uint16_t *)rawGyroData);
+//  Serial.print(rawGyroData[0]);
+//  Serial.print(", ");
+//  Serial.print(rawGyroData[1]);
+//  Serial.print(", ");
+//  Serial.println(rawGyroData[2]);
+//  Serial.println();
+
+  Serial.print("Hello World");
+  getQuadNorm();
+  Serial.print(quadNorm[0]);
   Serial.print(", ");
-  Serial.print(rawAccelData[1]);
+  Serial.print(quadNorm[1]);
   Serial.print(", ");
-  Serial.println(rawAccelData[2]);
-  
-  getMagneVec((uint16_t *)rawMagneData);
-  Serial.print(rawMagneData[0]);
-  Serial.print(", ");
-  Serial.print(rawMagneData[1]);
-  Serial.print(", ");
-  Serial.println(rawMagneData[2]);
-  
-  getGyroVec((uint16_t *)rawGyroData);
-  Serial.print(rawGyroData[0]);
-  Serial.print(", ");
-  Serial.print(rawGyroData[1]);
-  Serial.print(", ");
-  Serial.println(rawGyroData[2]);
+  Serial.print(quadNorm[2]);
   Serial.println();
   
   delay(50);
@@ -223,6 +232,8 @@ int16_t* cross(const int16_t* v1, const int16_t* v2) {
   answer[2] = v1[0] * v2[1] - v1[1] * v2[0];
   return answer;
 }
+
+
 
 
 
