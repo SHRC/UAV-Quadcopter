@@ -214,10 +214,20 @@ void getGyroVec(uint16_t *data){
   I2C_stop();
 }
 
-void getQuadNorm() {
-  quadNorm[0] = -rawAccelData[0];
-  quadNorm[1] = rawAccelData[1];
-  quadNorm[2] = -rawAccelData[2];
+void getQuadNorm(int dt) {
+  int16_t y = quadNorm[1];
+  int16_t z = quadNorm[2];
+
+  float dtheta = GYRO_CALIB * rawGyroData[0] * dt;
+  quadNorm[1] = y * cos(dtheta) - z * sin(dtheta);
+  quadNorm[2] = y * sin(dtheta) + z * cos(dtheta);
+
+  z = quadNorm[2];
+  int16_t x = quadNorm[0];
+
+  dtheta = GYRO_CALIB * rawGyroData[1] * dt;
+  quadNorm[2] = z * cos(dtheta) - x * sin(dtheta);
+  quadNorm[0] = z * sin(dtheta) + x * sin(dtheta);
 }
 
 void getOriX(int dt) {
@@ -227,7 +237,7 @@ void getOriX(int dt) {
  int16_t yx = oriY[0];
  int16_t yy = oriY[1];
  
- float dtheta = GYRO_CALIB * rawGyroData[1] * dt;
+ float dtheta = GYRO_CALIB * rawGyroData[2] * dt;
  oriX[0] = xx * cos(dtheta) - xy * sin(dtheta);
  oriX[1] = xx * sin(dtheta) + xy * cos(dtheta);
  
@@ -235,7 +245,7 @@ void getOriX(int dt) {
  oriY[1] = yx * sin(dtheta) + yy * cos(dtheta);
 }
 
-
+// aka setVelocity
 void getTorque(const int16_t* move) {
   int16_t resultant[] {base[0] + move[0], base[1] + move[1], base[2] + move[2]};
   torque = cross(quadNorm, resultant);
