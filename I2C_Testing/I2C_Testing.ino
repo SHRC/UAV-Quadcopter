@@ -5,7 +5,7 @@
 #define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
 #define GYRO_CALIB 1.0 // Need to test for this
 #define TORQUE_CALIB 1.0 // Need to test for this
-#define BUFFER_SIZE 7
+#define BUFFER_SIZE 15
 
 int16_t rawAccelData[3];
 int16_t rawMagneData[3];
@@ -33,7 +33,7 @@ void setup(){
 }
 
 void loop(void){
-//  getAccelVec((uint16_t *)rawAccelData);
+  getAccelVec((uint16_t *)rawAccelData);
 //  Serial.print(rawAccelData[0]);
 //  Serial.print(", ");
 //  Serial.print(rawAccelData[1]);
@@ -55,16 +55,23 @@ void loop(void){
 //  Serial.println(rawGyroData[2]);
 //  Serial.println();
 
-  Serial.print("Hello World");
-  getQuadNorm();
+  /*getQuadNorm();
   Serial.print(quadNorm[0]);
   Serial.print(", ");
   Serial.print(quadNorm[1]);
   Serial.print(", ");
   Serial.print(quadNorm[2]);
+  Serial.println();*/
+
+  getAverageAccelData();
+  Serial.print(averageAccelData[0]);
+  Serial.print(", ");
+  Serial.print(averageAccelData[1]);
+  Serial.print(", ");
+  Serial.print(averageAccelData[2]);
   Serial.println();
   
-  delay(50);
+  delay(2);
 }
 
 
@@ -246,7 +253,7 @@ int16_t* cross(const int16_t* v1, const int16_t* v2) {
 }
 
 void getAverageAccelData() {
-   int16_t sum = 0;
+   int32_t sum = 0;
    // Component 1
    for (int i = 0; i < BUFFER_SIZE; i++) {
       sum += accelDataBuffer[i][0]; 
