@@ -3,9 +3,12 @@
 #define F_SCL 100000UL // SCL frequency
 #define Prescaler 1
 #define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
-#define GYRO_CALIB 1.0 // Need to test for this
+#define GYRO_CALIB 0.000001 // Need to test for this
 #define TORQUE_CALIB 1.0 // Need to test for this
+#define GRAV_CALIB 16250 //probably around 16000
 #define BUFFER_SIZE 15
+
+unsigned long iTime = 0;
 
 int16_t rawAccelData[3];
 int16_t rawMagneData[3];
@@ -14,6 +17,8 @@ int16_t rawGyroData[3];
 int16_t averageAccelData[3];
 int16_t accelDataBuffer[BUFFER_SIZE][3];
 int buffer_oldest_index = 0;
+
+int16_t transAccelData[3]; // vector for translation only (gravity is deleted)
 
 int16_t base[3];
 
@@ -30,9 +35,16 @@ void setup(){
   gyro_init();
   Serial.begin(115200);
   Serial.println("test");
+  quadNorm[0] = 0;
+  quadNorm[1] = 0;
+  quadNorm[2] = GRAV_CALIB;
 }
 
 void loop(void){
+  long cTime = micros();
+  long dTime = cTime - iTime;
+  iTime = cTime;
+  
   getAccelVec((uint16_t *)rawAccelData);
 //  Serial.print(rawAccelData[0]);
 //  Serial.print(", ");
@@ -47,7 +59,7 @@ void loop(void){
 //  Serial.print(", ");
 //  Serial.println(rawMagneData[2]);
 //  
-//  getGyroVec((uint16_t *)rawGyroData);
+  getGyroVec((uint16_t *)rawGyroData);
 //  Serial.print(rawGyroData[0]);
 //  Serial.print(", ");
 //  Serial.print(rawGyroData[1]);
@@ -55,20 +67,21 @@ void loop(void){
 //  Serial.println(rawGyroData[2]);
 //  Serial.println();
 
-  /*getQuadNorm();
-  Serial.print(quadNorm[0]);
-  Serial.print(", ");
-  Serial.print(quadNorm[1]);
-  Serial.print(", ");
-  Serial.print(quadNorm[2]);
-  Serial.println();*/
+  getQuadNorm(dTime);
+//  Serial.print(quadNorm[0]);
+//  Serial.print(", ");
+//  Serial.print(quadNorm[1]);
+//  Serial.print(", ");
+//  Serial.print(quadNorm[2]);
+//  Serial.println();
 
   getAverageAccelData();
-  Serial.print(averageAccelData[0]);
+  getGlobalAccelData();
+  Serial.print(transAccelData[0]);
   Serial.print(", ");
-  Serial.print(averageAccelData[1]);
+  Serial.print(transAccelData[1]);
   Serial.print(", ");
-  Serial.print(averageAccelData[2]);
+  Serial.print(transAccelData[2]);
   Serial.println();
   
   delay(2);
@@ -219,6 +232,7 @@ void getQuadNorm(int dt) {
   int16_t z = quadNorm[2];
 
   float dtheta = GYRO_CALIB * rawGyroData[0] * dt;
+  Serial.println(dtheta);
   quadNorm[1] = y * cos(dtheta) - z * sin(dtheta);
   quadNorm[2] = y * sin(dtheta) + z * cos(dtheta);
 
@@ -230,6 +244,7 @@ void getQuadNorm(int dt) {
   quadNorm[0] = z * sin(dtheta) + x * sin(dtheta);
 }
 
+// getting the quad's orientation in the xy-plane
 void getOriX(int dt) {
  int16_t xx = oriX[0];
  int16_t xy = oriX[1];
@@ -245,7 +260,7 @@ void getOriX(int dt) {
  oriY[1] = yx * sin(dtheta) + yy * cos(dtheta);
 }
 
-// aka setVelocity
+// aka get vector needed to setVelocity
 void getTorque(const int16_t* move) {
   int16_t resultant[] {base[0] + move[0], base[1] + move[1], base[2] + move[2]};
   torque = cross(quadNorm, resultant);
@@ -290,6 +305,33 @@ void getAverageAccelData() {
    
    averageAccelData[2] = sum;
 }
+
+void getGlobalAccelData() {
+  // subtract gravitational component from the rawAccelData to get just the actual global acceleration
+  // normalize quadNorm
+  float magnitude = sqrt(quadNorm[0] * quadNorm[0] + quadNorm[1] * quadNorm[1] + quadNorm[2] * quadNorm[2]);
+  // should multiple each component by some gravity constant
+  int16_t g[3] {-quadNorm[0] / magnitude, -quadNorm[1] / magnitude, quadNorm[2] / magnitude};
+  transAccelData[0] = averageAccelData[0] - g[0];
+  transAccelData[1] = averageAccelData[1] - g[1];
+  transAccelData[2] = averageAccelData[2] - g[2];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
