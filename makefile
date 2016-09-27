@@ -1,6 +1,4 @@
-.PHONY: all
-.PHONY: clean
-.PHONY: upload
+.PHONY: all clean upload
 CC=avr-gcc
 MCU=atmega328
 TARGET= main
