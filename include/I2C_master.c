@@ -1,4 +1,4 @@
-#ifndef  F_CPU
+#ifndef F_CPU
 #define F_CPU 16000000UL
 #endif
 
@@ -11,11 +11,11 @@
 #define Prescaler 1
 #define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
 
-void I2C_init(void){
+void I2C_init(void) {
 	TWBR = TWBR_val;
 }
 
-uint8_t I2C_start(uint8_t address){
+uint8_t I2C_start(uint8_t address) {
 	// reset TWI control register
 	TWCR = 0;
 	// transmit START condition
@@ -24,7 +24,7 @@ uint8_t I2C_start(uint8_t address){
 	while( !(TWCR & (1<<TWINT)) );
 
 	// check if the start condition was successfully transmitted
-	if((TWSR & 0xF8) != TW_START){ return 1; }
+	if((TWSR & 0xF8) != TW_START) { return 1; }
 
 	// load slave address into data register
 	TWDR = address;
@@ -40,7 +40,7 @@ uint8_t I2C_start(uint8_t address){
 	return 0;
 }
 
-uint8_t I2C_write(uint8_t data){
+uint8_t I2C_write(uint8_t data) {
 	// load data into data register
 	TWDR = data;
 	// start transmission of data
@@ -48,13 +48,12 @@ uint8_t I2C_write(uint8_t data){
 	// wait for end of transmission
 	while( !(TWCR & (1<<TWINT)) );
 
-	if( (TWSR & 0xF8) != TW_MT_DATA_ACK ){ return 1; }
+	if( (TWSR & 0xF8) != TW_MT_DATA_ACK ) { return 1; }
 
 	return 0;
 }
 
-uint8_t I2C_read_ack(void){
-
+uint8_t I2C_read_ack(void) {
 	// start TWI module and acknowledge data after reception
 	TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWEA);
 	// wait for end of transmission
@@ -63,8 +62,7 @@ uint8_t I2C_read_ack(void){
 	return TWDR;
 }
 
-uint8_t I2C_read_nack(void){
-
+uint8_t I2C_read_nack(void) {
 	// start receiving without acknowledging reception
 	TWCR = (1<<TWINT) | (1<<TWEN);
 	// wait for end of transmission
@@ -73,7 +71,7 @@ uint8_t I2C_read_nack(void){
 	return TWDR;
 }
 
-void I2C_stop(void){
+void I2C_stop(void) {
 	// transmit STOP condition
 	TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWSTO);
 }

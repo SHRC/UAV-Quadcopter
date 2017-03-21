@@ -14,12 +14,12 @@
 
 typedef enum {
     FL_MOTOR = 0, //Pin 3
-    FR_MOTOR, //Pin 5
-    RL_MOTOR, //Pin 6
-    RR_MOTOR //Pin 11
+    FR_MOTOR,     //Pin 5
+    RL_MOTOR,     //Pin 6
+    RR_MOTOR      //Pin 11
 } MOTOR_NUM;
 
-void setupMotors(){
+void setupMotors() {
     DDRD |= _BV(FL_MOTOR_PIN);
     DDRB |= _BV(FR_MOTOR_PIN);
     DDRD |= _BV(BL_MOTOR_PIN);
@@ -36,8 +36,8 @@ void setupMotors(){
     TCCR2B |= _BV(CS21);
 }
 
-void setMotorPower(MOTOR_NUM n_motor, int power){
-    switch(n_motor){
+void setMotorPower(MOTOR_NUM n_motor, int power) {
+    switch(n_motor) {
     case FL_MOTOR: OCR2B = power;
     case FR_MOTOR: OCR0B = power;
     case RL_MOTOR: OCR0A = power;
@@ -45,13 +45,13 @@ void setMotorPower(MOTOR_NUM n_motor, int power){
     }
 }
 
-int main(void){
+int main(void) {
     I2C_init();
     setupMotors();
     int testpower = 0;
-    while(1){
+    while(1) {
         testpower++;
-        if (testpower > 256){
+        if (testpower > 256) {
             testpower = 0;
         }
         setMotorPower(FR_MOTOR, testpower);
@@ -61,5 +61,5 @@ int main(void){
         _delay_ms(20);
     }
 
-	return 1;
+    return 1;
 }

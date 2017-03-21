@@ -12,8 +12,7 @@
 #define HMC5883L_WRITE 0x3C
 #define HMC5883L_READ 0x3D 
 
-void init_uart(uint16_t baudrate){
-
+void init_uart(uint16_t baudrate) {
 	uint16_t UBRR_val = (F_CPU/16)/(baudrate-1);
 
 	UBRR0H = UBRR_val >> 8;
@@ -23,13 +22,12 @@ void init_uart(uint16_t baudrate){
 	UCSR0C |= (1<<USBS0) | (3<<UCSZ00); //Modus Asynchron 8N1 (8 Datenbits, No Parity, 1 Stopbit)
 }
 
-void uart_putc(unsigned char c){
-
+void uart_putc(unsigned char c) {
 	while(!(UCSR0A & (1<<UDRE0))); // wait until sending is possible
 	UDR0 = c; // output character saved in c
 }
 
-void uart_puts(char *s){
+void uart_puts(char *s) {
 	while(*s){
 		uart_putc(*s);
 		s++;
@@ -43,8 +41,7 @@ int16_t raw_y = 0;
 int16_t raw_z = 0;
 float headingDegrees = 0;
 
-void init_HMC5883L(void){
-
+void init_HMC5883L(void) {
 	I2C_start(HMC5883L_WRITE);
 	I2C_write(0x00); // set pointer to CRA
 	I2C_write(0x70); // write 0x70 to CRA
@@ -61,8 +58,7 @@ void init_HMC5883L(void){
 	I2C_stop();
 }
 
-float getHeading(void){
-
+float getHeading(void) {
 	I2C_start(HMC5883L_WRITE);
 	I2C_write(0x03); // set pointer to X axis MSB
 	I2C_stop();
@@ -85,13 +81,12 @@ float getHeading(void){
 	return headingDegrees;
 }
 
-int main(void){
-	
+int main(void) {
 	init_uart(57600);
 	I2C_init();
 	init_HMC5883L();
-	
-	while(1){
+
+	while(1) {
 		getHeading();
 		
 		itoa(raw_x, buffer, 10);
@@ -112,6 +107,6 @@ int main(void){
 		
 		_delay_ms(1000);
 	}
-	
+
 	return 0;
 }

@@ -28,7 +28,7 @@ int16_t oriY[2]; // Unit vector pointing in the direction of the North side of t
 
 int16_t * torque;
 
-void setup(){
+void setup() {
   I2C_init();
   accel_init();
   magne_init();
@@ -40,7 +40,7 @@ void setup(){
   quadNorm[2] = GRAV_CALIB;
 }
 
-void loop(void){
+void loop(void) {
   long cTime = micros();
   long dTime = cTime - iTime;
   iTime = cTime;
@@ -88,13 +88,13 @@ void loop(void){
 }
 
 
-void I2C_init(void){
+void I2C_init(void) {
   DDRC &= ~(0b01100000);
   PORTC |= 0b01100000;
   TWBR = TWBR_val;
 }
 
-uint8_t I2C_start(uint8_t address){
+uint8_t I2C_start(uint8_t address) {
   // reset TWI control register
   TWCR = 0;
   // transmit START condition
@@ -119,7 +119,7 @@ uint8_t I2C_start(uint8_t address){
   return 0;                                                                            
 }                                                                                            
                                                                                              
-uint8_t I2C_write(uint8_t data){                                                             
+uint8_t I2C_write(uint8_t data) {                                                             
   // load data into data register                                                      
   TWDR = data;                                                                         
   // start transmission of data                                                        
@@ -132,7 +132,7 @@ uint8_t I2C_write(uint8_t data){
   return 0;
 }
 
-uint8_t I2C_read_ack(void){
+uint8_t I2C_read_ack(void) {
 
   // start TWI module and acknowledge data after reception
   TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWEA);
@@ -142,7 +142,7 @@ uint8_t I2C_read_ack(void){
   return TWDR;
 }
 
-uint8_t I2C_read_nack(void){
+uint8_t I2C_read_nack(void) {
 
   // start receiving without acknowledging reception
   TWCR = (1<<TWINT) | (1<<TWEN);
@@ -152,19 +152,19 @@ uint8_t I2C_read_nack(void){
   return TWDR;
 }
 
-void I2C_stop(void){
+void I2C_stop(void) {
   // transmit STOP condition
   TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWSTO);
 }
 
-void accel_init(void){
+void accel_init(void) {
   I2C_start(0b00110010);
   I2C_write(0x20);
   I2C_write(0b01010111);
   I2C_stop();
 }
 
-void magne_init(void){
+void magne_init(void) {
   I2C_start(0b00111100);
   I2C_write(0x01);
   I2C_write(0x20);
@@ -172,7 +172,7 @@ void magne_init(void){
   I2C_stop();
 }
 
-void gyro_init(void){
+void gyro_init(void) {
   I2C_start(0b11010110);
   I2C_write(0xA0);
   I2C_write(0b00001111);
@@ -181,7 +181,7 @@ void gyro_init(void){
 }
   
 
-void getAccelVec(uint16_t *data){
+void getAccelVec(uint16_t *data) {
   accelDataBuffer[buffer_oldest_index][0] = rawAccelData[0];
   accelDataBuffer[buffer_oldest_index][1] = rawAccelData[1];
   accelDataBuffer[buffer_oldest_index][2] = rawAccelData[2];
@@ -201,7 +201,7 @@ void getAccelVec(uint16_t *data){
 
 }
 
-void getMagneVec(uint16_t *data){
+void getMagneVec(uint16_t *data) {
   I2C_start(0b00111100);
   I2C_write(0x03);
   I2C_start(0b00111101);
@@ -214,7 +214,7 @@ void getMagneVec(uint16_t *data){
   I2C_stop();
 }
 
-void getGyroVec(uint16_t *data){
+void getGyroVec(uint16_t *data) {
   I2C_start(0b11010110);
   I2C_write(0xA8);
   I2C_start(0b11010111);
